@@ -60,6 +60,7 @@ reference CAL.
 | Coverage | 98.18% lines, 97.37% regions, 96.75% functions |
 | Changed-line gate | 95% minimum, 100% on the current change |
 | CI | Green on Ubuntu, macOS, and Windows |
+| Release | v0.1.0 with Linux, macOS, and Windows binaries |
 | Generated crate | 2 round-trip tests, 100 iterations each |
 | Docs | 10,702 pages, static checks and 30 browser checks pass |
 | Accessibility | 8 contrast pairs pass WCAG AA, keyboard focus, light and dark themes |
@@ -79,7 +80,11 @@ Reproduce everything with `make check`. Command output and evidence are in
 ```bash
 git clone https://github.com/vindeckyy/uci-forge.git
 cd uci-forge
+```
 
+Prebuilt binaries: [v0.1.0](https://github.com/vindeckyy/uci-forge/releases/tag/v0.1.0).
+
+```bash
 make fetch-spec
 cargo run -p uci-cli -- schema-stats
 cargo run -p uci-cli -- docs --out site --diff-old spec/002.5.0

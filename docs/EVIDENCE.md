@@ -63,6 +63,16 @@ cargo test --manifest-path examples/generated/uci-types/Cargo.toml
 cargo test: 2 round-trip tests, 100 iterations each
 ```
 
+## Release
+
+Tag `v0.1.0` published three binaries:
+
+```text
+forge-aarch64-apple-darwin
+forge-x86_64-unknown-linux-gnu
+forge-x86_64-pc-windows-msvc.exe
+```
+
 ## Parser fuzzing
 
 ```bash

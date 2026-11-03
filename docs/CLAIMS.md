@@ -15,6 +15,7 @@ does not exist, the claim is removed.
 | Meets a coverage gate | 98.18% lines, 97.37% regions, 96.75% functions, 95% changed-line gate | Excludes `src/bin/` and `src/main.rs` |
 | Fuzzes the parser | 10,000 libFuzzer runs, no crash | Bounded run, not a proof |
 | Works in CI | Green on Ubuntu, macOS, and Windows | Does not test hardware or classified networks |
+| Has a release | v0.1.0 with Linux, macOS, and Windows binaries | Prebuilt binaries are convenience artifacts, not a support contract |
 | Is accessible | 8 contrast pairs pass WCAG AA, keyboard focus, light and dark themes | Not a full WCAG audit |
 | Is ready for operations | **No claim.** This is developer tooling | Not certified, not approved, not operational |
 
