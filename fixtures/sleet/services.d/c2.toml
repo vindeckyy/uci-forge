@@ -1,0 +1,11 @@
+service_id = "c2"
+service_uuid = "123e4567-e89b-12d3-a456-426614174001"
+allowed_topics = ["mission.task", "mission.signal"]
+
+[[topic_bindings]]
+topic = "mission.task"
+allowed_messages = ["TaskCommand"]
+
+[[topic_bindings]]
+topic = "mission.signal"
+allowed_messages = ["SignalReport"]

@@ -1,0 +1,32 @@
+broker = "ws://127.0.0.1:9100/"
+schema = "002.6.0"
+
+[[step]]
+at = "0s"
+service = "c2"
+action = "publish"
+topic = "mission.task"
+message = "../../fixtures/messages/task_command.json"
+
+[[step]]
+at = "100ms"
+service = "sensor"
+action = "expect"
+topic = "mission.task"
+message = "TaskCommand"
+timeout = "3s"
+
+[[step]]
+at = "200ms"
+service = "sensor"
+action = "publish"
+topic = "mission.signal"
+message = "../../fixtures/messages/signal_report.json"
+
+[[step]]
+at = "300ms"
+service = "c2"
+action = "expect"
+topic = "mission.signal"
+message = "SignalReport"
+timeout = "3s"

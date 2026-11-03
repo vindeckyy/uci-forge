@@ -1,0 +1,21 @@
+[package]
+name = "uci-schema-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+uci-schema = { path = "../crates/uci-schema" }
+
+[[bin]]
+name = "parse_xsd"
+path = "fuzz_targets/parse_xsd.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

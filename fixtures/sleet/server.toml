@@ -1,0 +1,8 @@
+bind_addr = "127.0.0.1:9100"
+server_id = "uci-forge-sleet"
+system_label = "UCI Forge test"
+schema_path = "./spec/002.6.0/UCI_MessageDefinitions_v2_6_0.xsd"
+schema_version = "002.6.0"
+system_uuid = "123e4567-e89b-12d3-a456-426614174000"
+services_dir = "./fixtures/sleet/services.d"
+metrics_bind_addr = "127.0.0.1:21313"

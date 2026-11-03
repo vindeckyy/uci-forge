@@ -1,0 +1,30 @@
+# Working plan, kept out of the repo
+/PLAN.md
+/community/
+
+# Fetched UCI schema snapshots
+/spec/
+
+# Generated documentation site
+/site/
+
+# Rust build output
+/target/
+/examples/generated/uci-types/target/
+**/*.rs.bk
+
+# Local transcripts and captures (fixtures under fixtures/ stay tracked)
+/transcripts/
+
+# Coverage
+/coverage/
+*.profraw
+
+# Environment and editor noise
+.env
+.DS_Store
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/

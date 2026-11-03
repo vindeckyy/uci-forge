@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:uci="urn:uci:test"
+           targetNamespace="urn:uci:test"
+           elementFormDefault="qualified"
+           version="002.6.0">
+
+  <xs:simpleType name="ModeEnum">
+    <xs:annotation><xs:documentation>Operating mode.</xs:documentation></xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AUTO"/>
+      <xs:enumeration value="MANUAL"/>
+      <xs:enumeration value="SAFE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CallsignType">
+    <xs:annotation><xs:documentation>Short callsign.</xs:documentation></xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="16"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="MessageHeaderType">
+    <xs:annotation><xs:documentation>Common message header.</xs:documentation></xs:annotation>
+    <xs:sequence>
+      <xs:element name="MessageID" type="xs:string"/>
+      <xs:element name="Timestamp" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BaseMessageType">
+    <xs:sequence>
+      <xs:element name="MessageHeader" type="uci:MessageHeaderType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PayloadType" abstract="true">
+    <xs:annotation><xs:documentation>Abstract payload base.</xs:documentation></xs:annotation>
+    <xs:sequence>
+      <xs:element name="Kind" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TrackPayloadType">
+    <xs:complexContent>
+      <xs:extension base="uci:PayloadType">
+        <xs:sequence>
+          <xs:element name="TrackID" type="xs:string"/>
+          <xs:element name="Mode" type="uci:ModeEnum" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ChoiceType">
+    <xs:annotation><xs:documentation>Exactly one of Alpha or Beta.</xs:documentation></xs:annotation>
+    <xs:choice>
+      <xs:element name="Alpha" type="xs:string"/>
+      <xs:element name="Beta" type="xs:int"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="MiniMessageMT">
+    <xs:annotation>
+      <xs:documentation>Test message root.</xs:documentation>
+      <xs:documentation>UCI_PRIMITIVE: Data-1.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="uci:BaseMessageType">
+        <xs:sequence>
+          <xs:element name="Payload" type="uci:PayloadType"/>
+          <xs:element name="Note" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="Choice" type="uci:ChoiceType"/>
+          <xs:element name="Callsign" type="uci:CallsignType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="MiniMessage" type="uci:MiniMessageMT"/>
+</xs:schema>

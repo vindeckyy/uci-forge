@@ -1,0 +1,13 @@
+UCI Forge
+Copyright 2026 UCI Forge contributors
+
+This product includes software adapted from Sleet, the OMS Language-Agnostic
+CAL server maintained in the Open Arsenal project:
+https://gitlab.com/open-arsenal/ams-gra/hello-world-sk/infra/sleet
+
+Sleet is licensed under the Apache License, Version 2.0. Adapted modules carry
+their original license headers and are identified in the repository history.
+
+The UCI schema is a U.S. Government work released under Distribution Statement A.
+It is not operational, and this project is not affiliated with or endorsed by the
+U.S. Air Force or the Department of War.

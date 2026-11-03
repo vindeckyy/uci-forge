@@ -1,0 +1,14 @@
+[package]
+name = "uci-docs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+uci-schema = { path = "../uci-schema" }
+uci-validate = { path = "../uci-validate" }
+uci-diff = { path = "../uci-diff" }
+anyhow.workspace = true
+heck.workspace = true
+serde_json.workspace = true
+regex.workspace = true

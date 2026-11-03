@@ -1,0 +1,38 @@
+{
+  "TaskCommand": {
+    "MessageData": {
+      "Command": [
+        {
+          "Allocation": {
+            "SystemID": {
+              "UUID": "123e4567-e89b-12d3-a456-426614174000"
+            }
+          },
+          "CommandID": {
+            "UUID": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "CommandState": "NEW",
+          "TaskID": {
+            "UUID": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        }
+      ]
+    },
+    "MessageHeader": {
+      "Mode": "LIVE",
+      "SchemaVersion": "002.6.0",
+      "SystemID": {
+        "UUID": "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "Timestamp": "2026-11-02T12:00:00Z"
+    },
+    "SecurityInformation": {
+      "Classification": "R",
+      "OwnerProducer": [
+        {
+          "GovernmentIdentifier": "FGI"
+        }
+      ]
+    }
+  }
+}

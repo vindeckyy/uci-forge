@@ -1,0 +1,62 @@
+{
+  "from": "002.5.0",
+  "to": "002.6.0",
+  "changes": [
+    {
+      "kind": "ENUM_VALUE_ADDED",
+      "class": "risky",
+      "message": null,
+      "path": "type.MessageTypeEnum",
+      "detail": "value SYSTEM_SCHEDULE added"
+    },
+    {
+      "kind": "ENUM_VALUE_ADDED",
+      "class": "risky",
+      "message": null,
+      "path": "type.MessageTypeEnum",
+      "detail": "value SYSTEM_SCHEDULE_DATA_REQUEST added"
+    },
+    {
+      "kind": "ENUM_VALUE_ADDED",
+      "class": "risky",
+      "message": null,
+      "path": "type.MessageTypeEnum",
+      "detail": "value SYSTEM_SCHEDULE_DATA_REQUEST_STATUS added"
+    },
+    {
+      "kind": "ENUM_VALUE_ADDED",
+      "class": "risky",
+      "message": null,
+      "path": "type.OrbitRegimeEnum",
+      "detail": "value SUBORBITAL added"
+    },
+    {
+      "kind": "ENUM_VALUE_ADDED",
+      "class": "risky",
+      "message": null,
+      "path": "type.OrbitRegimeEnum",
+      "detail": "value VLEO added"
+    },
+    {
+      "kind": "MESSAGE_ADDED",
+      "class": "compatible",
+      "message": "SystemSchedule",
+      "path": "SystemSchedule",
+      "detail": "new message root"
+    },
+    {
+      "kind": "MESSAGE_ADDED",
+      "class": "compatible",
+      "message": "SystemScheduleDataRequest",
+      "path": "SystemScheduleDataRequest",
+      "detail": "new message root"
+    },
+    {
+      "kind": "MESSAGE_ADDED",
+      "class": "compatible",
+      "message": "SystemScheduleDataRequestStatus",
+      "path": "SystemScheduleDataRequestStatus",
+      "detail": "new message root"
+    }
+  ]
+}

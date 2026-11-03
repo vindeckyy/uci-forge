@@ -1,0 +1,35 @@
+{
+  "PositionReport": {
+    "MessageData": {
+      "CurrentOperatingDomain": "AIR",
+      "InertialState": {
+        "Position": {
+          "Altitude": 0.0,
+          "Latitude": 0.0,
+          "Longitude": 0.0,
+          "Timestamp": "2026-11-02T12:00:00Z"
+        }
+      },
+      "Source": "ACTUAL",
+      "SystemID": {
+        "UUID": "123e4567-e89b-12d3-a456-426614174000"
+      }
+    },
+    "MessageHeader": {
+      "Mode": "LIVE",
+      "SchemaVersion": "002.6.0",
+      "SystemID": {
+        "UUID": "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "Timestamp": "2026-11-02T12:00:00Z"
+    },
+    "SecurityInformation": {
+      "Classification": "R",
+      "OwnerProducer": [
+        {
+          "GovernmentIdentifier": "FGI"
+        }
+      ]
+    }
+  }
+}
