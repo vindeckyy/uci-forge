@@ -2,7 +2,7 @@
 
 # UCI Forge
 
-**Typed tooling for the public UCI 2.6 command-and-control schema.**
+**Unofficial typed tooling for the public UCI 2.6 command-and-control schema.**
 
 A Rust toolchain that turns a 9 MB XSD into typed bindings, validation, a version
 diff, a searchable reference, and a scripted mission thread against the reference CAL.
@@ -12,12 +12,19 @@ diff, a searchable reference, and a scripted mission thread against the referenc
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](rust-toolchain.toml)
 [![UCI](https://img.shields.io/badge/UCI-2.6-9a3b00.svg)](https://github.com/open-arsenal/uci)
+[![Release](https://img.shields.io/github/v/release/vindeckyy/uci-forge?display_name=tag)](https://github.com/vindeckyy/uci-forge/releases)
 
 [Live docs](https://vindeckyy.github.io/uci-forge/) ·
-[Verification](docs/EVIDENCE.md) ·
-[Delivery gate](docs/DELIVERY-GATE.md)
+[Design](docs/DESIGN.md) ·
+[Codegen](docs/CODEGEN.md) ·
+[Claims](docs/CLAIMS.md) ·
+[Examples](examples/README.md) ·
+[Verification](docs/EVIDENCE.md)
 
 </div>
+
+> **Status:** unofficial developer tooling. Not certified, not operational, not
+> affiliated with the U.S. Air Force. See [claims and limits](docs/CLAIMS.md).
 
 ![UCI Forge documentation index](docs/assets/site-index.png)
 
@@ -38,7 +45,7 @@ reference CAL.
 | Capability | Detail |
 |---|---|
 | Parse | XSD to a stable model, including extension chains, choices, abstract types, and docs |
-| Generate | 4,535 Rust structs and 710 enums from 20 core message roots |
+| Generate | 4,535 Rust structs and 710 enums, generated on demand from 20 core roots |
 | Validate | Stable error codes and exact JSON paths |
 | Diff | UCI 2.5 to 2.6: 0 breaking, 5 risky, 3 compatible |
 | Document | 10,702 pages for 2.6 and 2.5, search, examples, version switch |
@@ -49,16 +56,19 @@ reference CAL.
 
 | Gate | Result |
 |---|---|
-| Tests | 146 pass |
-| Coverage | 98.05% lines, 97.27% regions, 96.66% functions |
+| Tests | 151 pass |
+| Coverage | 98.18% lines, 97.37% regions, 96.75% functions |
 | Changed-line gate | 95% minimum, 100% on the current change |
 | CI | Green on Ubuntu, macOS, and Windows |
 | Generated crate | 2 round-trip tests, 100 iterations each |
 | Docs | 10,702 pages, static checks and 30 browser checks pass |
-| Accessibility | WCAG AA contrast, keyboard focus, light and dark themes |
+| Accessibility | 8 contrast pairs pass WCAG AA, keyboard focus, light and dark themes |
 | Diff | 0 breaking, 5 risky, 3 compatible |
 | Fuzzing | 10,000 parser runs, no crash |
-| Sleet | 4 events across two services |
+| Sleet | One scripted scenario, 4 events, not a certification |
+
+Generated output is not committed. CI generates the crate, compiles it, and runs
+its round-trip tests.
 
 Reproduce everything with `make check`. Command output and evidence are in
 [docs/EVIDENCE.md](docs/EVIDENCE.md). The antislop report is in
@@ -74,6 +84,13 @@ make fetch-spec
 cargo run -p uci-cli -- schema-stats
 cargo run -p uci-cli -- docs --out site --diff-old spec/002.5.0
 cargo run -p uci-cli -- sim examples/scenarios/tasking.toml --embedded
+```
+
+More runnable examples: [examples/README.md](examples/README.md). The smoke script
+checks schema counts, validation, and a four-event scenario:
+
+```bash
+./examples/smoke.sh
 ```
 
 Generate the typed crate:
@@ -155,10 +172,10 @@ flowchart LR
 
 | Area | Evidence |
 |---|---|
-| Standards adoption | UCI 2.6, OMS/OWP, and the Sleet reference CAL |
+| Standards work | UCI 2.6 schema, OMS/OWP message flow, Sleet integration |
 | Compiler and codegen | XSD model to 4,535 structs and 710 enums |
 | Protocol integration | OWP client, subscriptions, task and report flow |
-| Verification | 146 tests, 98.05% line coverage, 10,000 fuzz runs |
+| Verification | 151 tests, 98.18% line coverage, 10,000 fuzz runs |
 | Technical writing | 10,702 reference pages, search, version switch |
 | Security discipline | Public Distribution A only, no CUI, no compliance claims |
 

@@ -31,7 +31,7 @@ cargo test --workspace
 ```
 
 ```text
-146 passed, 0 failed
+151 passed, 0 failed
 ```
 
 Coverage:
@@ -41,10 +41,10 @@ Coverage:
 ```
 
 ```text
-TOTAL regions 97.27%, functions 96.66%, lines 98.05%
+TOTAL regions 97.37%, functions 96.75%, lines 98.18%
 changed-line gate: 95% minimum
 baseline commit: 98.30% (4,341/4,416)
-current change since first commit: 100.00% (472/472)
+current change: 98.29% (172/175)
 ```
 
 Instrumented lines exclude `src/bin/` and `src/main.rs` as glue.

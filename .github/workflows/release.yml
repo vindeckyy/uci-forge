@@ -1,0 +1,57 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin: forge
+          - os: macos-14
+            target: aarch64-apple-darwin
+            bin: forge
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: forge.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p uci-cli --target ${{ matrix.target }}
+      - name: Package
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          BIN: ${{ matrix.bin }}
+        run: |
+          mkdir -p dist
+          dest="dist/forge-${TARGET}"
+          if [[ "$BIN" == *.exe ]]; then dest="${dest}.exe"; fi
+          cp "target/${TARGET}/release/${BIN}" "$dest"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: forge-${{ matrix.target }}
+          path: dist/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

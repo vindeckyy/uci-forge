@@ -1,4 +1,4 @@
-.PHONY: fetch-spec test fmt clippy coverage docs generated sim check
+.PHONY: fetch-spec test fmt clippy coverage docs generated sim smoke check
 
 fetch-spec:
 	./scripts/fetch-spec.sh
@@ -27,4 +27,7 @@ generated:
 sim:
 	cargo run -p uci-cli -- sim examples/scenarios/tasking.toml --embedded
 
-check: fmt clippy test generated coverage docs
+smoke:
+	./examples/smoke.sh
+
+check: fmt clippy test generated coverage docs smoke

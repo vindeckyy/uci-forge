@@ -39,6 +39,27 @@ pub struct GeneratedFile {
     pub contents: String,
 }
 
+/// A code generation failure with a stable reason.
+#[derive(Debug, thiserror::Error, PartialEq, Eq)]
+pub enum CodegenError {
+    /// No message names were supplied.
+    #[error("no messages selected")]
+    NoMessages,
+    /// A requested message does not exist in the schema.
+    #[error("unknown message: {0}")]
+    UnknownMessage(String),
+    /// A field references a type that is neither declared nor a known builtin.
+    #[error("unknown type {type_name} in {owner}.{field}")]
+    UnknownType {
+        /// Owning complex type.
+        owner: String,
+        /// Field name.
+        field: String,
+        /// Missing type name.
+        type_name: String,
+    },
+}
+
 /// Mapping from UCI names to Rust names.
 #[derive(Debug, Default)]
 struct Namer {
@@ -73,13 +94,22 @@ impl Namer {
 }
 
 /// Generate the crate files for the selected messages.
-pub fn generate(schema: &Schema, message_names: &[String]) -> anyhow::Result<Vec<GeneratedFile>> {
+pub fn generate(
+    schema: &Schema,
+    message_names: &[String],
+) -> Result<Vec<GeneratedFile>, CodegenError> {
+    if message_names.is_empty() {
+        return Err(CodegenError::NoMessages);
+    }
+    for name in message_names {
+        if !schema.messages.contains_key(name) {
+            return Err(CodegenError::UnknownMessage(name.clone()));
+        }
+    }
     let roots: Vec<String> = message_names
         .iter()
         .filter_map(|name| schema.messages.get(name).map(|m| m.root_type.clone()))
         .collect();
-    anyhow::ensure!(!roots.is_empty(), "no known messages selected");
-
     let mut all_types = schema.reachable_types(&roots);
     loop {
         let mut added = false;
@@ -102,6 +132,8 @@ pub fn generate(schema: &Schema, message_names: &[String]) -> anyhow::Result<Vec
             break;
         }
     }
+    validate_types(schema, &all_types)?;
+
     let mut complex = BTreeSet::new();
     let mut enums = BTreeSet::new();
 
@@ -162,6 +194,68 @@ pub fn write_files(root: &Path, files: &[GeneratedFile]) -> anyhow::Result<()> {
         std::fs::write(&path, &file.contents)?;
     }
     Ok(())
+}
+
+fn validate_types(schema: &Schema, all: &BTreeSet<String>) -> Result<(), CodegenError> {
+    for owner in all {
+        for field in schema.fields(owner) {
+            let known = schema.complex(&field.type_name).is_some()
+                || schema.simple(&field.type_name).is_some()
+                || is_builtin(&field.type_name);
+            if !known {
+                return Err(CodegenError::UnknownType {
+                    owner: owner.clone(),
+                    field: field.name.clone(),
+                    type_name: field.type_name.clone(),
+                });
+            }
+        }
+    }
+    Ok(())
+}
+
+fn is_builtin(name: &str) -> bool {
+    matches!(
+        name,
+        "string"
+            | "boolean"
+            | "int"
+            | "integer"
+            | "long"
+            | "short"
+            | "byte"
+            | "unsignedInt"
+            | "unsignedLong"
+            | "unsignedShort"
+            | "unsignedByte"
+            | "positiveInteger"
+            | "nonNegativeInteger"
+            | "negativeInteger"
+            | "nonPositiveInteger"
+            | "double"
+            | "float"
+            | "decimal"
+            | "dateTime"
+            | "date"
+            | "time"
+            | "hexBinary"
+            | "base64Binary"
+            | "anyURI"
+            | "normalizedString"
+            | "token"
+            | "Name"
+            | "NCName"
+            | "ID"
+            | "IDREF"
+            | "language"
+            | "QName"
+            | "duration"
+            | "gYear"
+            | "gMonth"
+            | "gDay"
+            | "gYearMonth"
+            | "gMonthDay"
+    )
 }
 
 fn collect_simple(schema: &Schema, name: &str, enums: &mut BTreeSet<String>) {
@@ -628,7 +722,64 @@ mod tests {
     #[test]
     fn rejects_unknown_message() {
         let schema = mini();
-        assert!(generate(&schema, &["Nope".to_owned()]).is_err());
+        assert_eq!(
+            generate(&schema, &["Nope".to_owned()]),
+            Err(CodegenError::UnknownMessage("Nope".to_owned()))
+        );
+    }
+
+    #[test]
+    fn rejects_unknown_field_type() {
+        use uci_schema::{Content, TypeInfo};
+        let mut schema = mini();
+        let complex = schema
+            .types
+            .get_mut("MiniMessageMT")
+            .and_then(|t| match t {
+                TypeInfo::Complex(c) => Some(c),
+                TypeInfo::Simple(_) => None,
+            })
+            .unwrap();
+        let Content::Sequence { elements } = &mut complex.content else {
+            panic!("MiniMessageMT is not a sequence");
+        };
+        let field = elements.iter_mut().find(|f| f.name == "Callsign").unwrap();
+        field.type_name = "Mystery".to_owned();
+        assert_eq!(
+            generate(&schema, &["MiniMessage".to_owned()]),
+            Err(CodegenError::UnknownType {
+                owner: "MiniMessageMT".to_owned(),
+                field: "Callsign".to_owned(),
+                type_name: "Mystery".to_owned(),
+            })
+        );
+    }
+
+    #[test]
+    fn builtins_are_recognized() {
+        assert!(is_builtin("string"));
+        assert!(is_builtin("dateTime"));
+        assert!(is_builtin("hexBinary"));
+        assert!(!is_builtin("CustomType"));
+    }
+
+    #[test]
+    fn generates_default_suite_from_real_schema() {
+        let spec = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spec/002.6.0");
+        let schema = Schema::load_dir(&spec).expect("load 2.6");
+        let names: Vec<String> = DEFAULT_MESSAGES.iter().map(|s| (*s).to_owned()).collect();
+        let files = generate(&schema, &names).expect("generate");
+        assert_eq!(files.len(), 4);
+        let types = files
+            .iter()
+            .find(|f| f.path == "src/types.rs")
+            .expect("types");
+        assert!(types.contents.contains("pub struct TaskCommand"));
+        assert!(types.contents.contains("pub enum"));
+        assert!(
+            types.contents.len() > 1_000_000,
+            "generated output is smaller than expected"
+        );
     }
 
     #[test]
@@ -654,7 +805,7 @@ mod tests {
 
     #[test]
     fn rejects_empty_selection_and_bad_output() {
-        assert!(generate(&mini(), &[]).is_err());
+        assert_eq!(generate(&mini(), &[]), Err(CodegenError::NoMessages));
         let dir = std::env::temp_dir().join(format!("uci-codegen-bad-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();

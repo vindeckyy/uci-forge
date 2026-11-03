@@ -148,17 +148,14 @@ pub async fn run(cli: Cli) -> anyhow::Result<i32> {
             json,
         } => {
             let schema = Schema::load_dir(&dir)?;
-            let text = if session {
-                let mut text = String::new();
-                use std::io::Read as _;
-                std::io::stdin().read_to_string(&mut text)?;
-                text
+            if session {
+                validate_session(&schema, std::io::stdin(), json)
             } else {
                 let file = file.context("--file or --session is required")?;
-                std::fs::read_to_string(&file)
-                    .with_context(|| format!("read {}", file.display()))?
-            };
-            validate_text(&schema, &text, json)
+                let text = std::fs::read_to_string(&file)
+                    .with_context(|| format!("read {}", file.display()))?;
+                validate_one(&schema, &text, json)
+            }
         }
         Command::Sim {
             scenario,
@@ -261,6 +258,40 @@ pub async fn run(cli: Cli) -> anyhow::Result<i32> {
                 );
             }
             Ok(0)
+        }
+    }
+}
+
+fn validate_session<R: std::io::Read>(
+    schema: &Schema,
+    mut reader: R,
+    json: bool,
+) -> anyhow::Result<i32> {
+    let mut text = String::new();
+    reader.read_to_string(&mut text)?;
+    validate_text(schema, &text, json)
+}
+
+fn validate_one(schema: &Schema, text: &str, json: bool) -> anyhow::Result<i32> {
+    match uci_validate::validate_str(schema, text) {
+        Ok(name) => {
+            if !json {
+                println!("ok {name}");
+            }
+            Ok(0)
+        }
+        Err(errors) => {
+            if json {
+                println!("{}", serde_json::to_string(&errors)?);
+            } else {
+                for error in errors {
+                    println!(
+                        "{}: {} expected={:?} found={:?}",
+                        error.path, error.code, error.expected, error.found
+                    );
+                }
+            }
+            Ok(1)
         }
     }
 }
@@ -469,6 +500,37 @@ mod tests {
             validate_text(&schema, &format!("{good}\n"), false).unwrap(),
             0
         );
+    }
+
+    #[test]
+    fn validate_one_accepts_pretty_json() {
+        let schema = Schema::load_dir(std::path::Path::new(&path("fixtures"))).unwrap();
+        let good = r#"{
+  "MiniMessage": {
+    "MessageHeader": {
+      "MessageID": "m",
+      "Timestamp": "2026-11-02T12:00:00Z"
+    },
+    "Payload": {
+      "$type": "TrackPayloadType",
+      "Kind": "k",
+      "TrackID": "t"
+    },
+    "Choice": { "Alpha": "a" }
+  }
+}"#;
+        assert_eq!(validate_one(&schema, good, false).unwrap(), 0);
+        assert_eq!(validate_one(&schema, good, true).unwrap(), 0);
+        assert_eq!(validate_one(&schema, r#"{"Nope":{}}"#, true).unwrap(), 1);
+        assert_eq!(validate_one(&schema, r#"{"Nope":{}}"#, false).unwrap(), 1);
+    }
+
+    #[test]
+    fn validate_session_reads_jsonl() {
+        let schema = Schema::load_dir(std::path::Path::new(&path("fixtures"))).unwrap();
+        let good = r#"{"MiniMessage":{"MessageHeader":{"MessageID":"m","Timestamp":"2026-11-02T12:00:00Z"},"Payload":{"$type":"TrackPayloadType","Kind":"k","TrackID":"t"},"Choice":{"Alpha":"a"}}}"#;
+        let text = format!("{good}\n{good}\n");
+        assert_eq!(validate_session(&schema, text.as_bytes(), true).unwrap(), 0);
     }
 
     #[tokio::test]

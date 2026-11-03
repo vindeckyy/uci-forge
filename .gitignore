@@ -9,6 +9,7 @@
 /site/
 
 # Rust build output
+/examples/generated/
 /target/
 /examples/generated/uci-types/target/
 **/*.rs.bk

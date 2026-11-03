@@ -8,3 +8,4 @@ license.workspace = true
 uci-schema = { path = "../uci-schema" }
 anyhow.workspace = true
 heck.workspace = true
+thiserror.workspace = true

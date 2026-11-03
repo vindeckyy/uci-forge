@@ -31,7 +31,10 @@ jobs:
           python-version: "3.x"
       - run: python scripts/fetch_spec.py
       - run: cargo test --workspace
+      - run: cargo run -p uci-cli -- gen --out examples/generated/uci-types
       - run: cargo test --manifest-path examples/generated/uci-types/Cargo.toml
+      - if: runner.os == 'Linux'
+        run: ./examples/smoke.sh
 
   coverage:
     runs-on: ubuntu-latest
